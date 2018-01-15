@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.StringTokenizer;
 
 public class CalculatorBmi extends JFrame implements ActionListener {
 
@@ -12,6 +13,7 @@ public class CalculatorBmi extends JFrame implements ActionListener {
     private JPanel inputPanel, mainPanel;
     private JButton actionButton;
     private double BMI, weight, height;
+    private String msg = "";
 
     public CalculatorBmi() {
         super("Calculator BMI"); // nazwa okna
@@ -21,7 +23,7 @@ public class CalculatorBmi extends JFrame implements ActionListener {
         setLocationRelativeTo(null); // ustawienie okna na srodku
 
         // tworze etykiety
-        mainLabel = new JLabel("<html><center>Enter your data and calculate BMI !</center>" +
+        mainLabel = new JLabel("<html><center>Calculator BMI for adult people (age 18+)</center>" +
                 "You must have weight>45 and height>150</html>", SwingConstants.CENTER);
         weightLabel = new JLabel("Your weight [kg]: ");
         weightLabel.setPreferredSize(new Dimension(100, 15));
@@ -64,24 +66,50 @@ public class CalculatorBmi extends JFrame implements ActionListener {
         this.setVisible(true); // widoczność
     }
 
+
+    // metoda do pobrania z pola tekstowego wagi
     private void getW() {
-        weight = Double.parseDouble(weightTxt.getText());
+        StringTokenizer st = new StringTokenizer(weightTxt.getText(), ",");
+        if (st.countTokens() == 2) {
+            if (st.hasMoreTokens()) {
+                String valueA = st.nextToken();
+                String valueB = st.nextToken();
+                String value = valueA + "." + valueB;
+                weight = Double.parseDouble(value);
+            }
+        } else {
+            weight = Double.parseDouble(weightTxt.getText());
+        }
     }
 
+    // metoda do pobrania z pola tekstowego wysokości
     private void getH() {
-        height = (Double.parseDouble(heightTxt.getText()) / 100);
+        StringTokenizer st = new StringTokenizer(heightTxt.getText(), ",");
+        if (st.countTokens() == 2) {
+            if (st.hasMoreTokens()) {
+                String valueA = st.nextToken();
+                String valueB = st.nextToken();
+                String value = valueA + "." + valueB;
+                height = (Double.parseDouble(value) / 100);
+            }
+        } else {
+            height = (Double.parseDouble(heightTxt.getText()) / 100);
+        }
     }
 
+    // metoda do obliczenia BMI
     private void calc() {
         BMI = ((weight) / (Math.pow(height, 2)));
     }
 
+    // metoda to wyswietlania rezultatów
     private void results() {
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
-        JOptionPane.showMessageDialog(null, "Your's BMI : " + df.format(BMI));
+        JOptionPane.showMessageDialog(null, "Your's BMI is  " + df.format(BMI) + "  you are " + msg);
     }
 
+    // metoda do sprawdzania poprawnosci wprowadzonych danych
     private boolean isCorrect() {
         boolean correct = true;
         // sprawdzanie czy wprowadzone sa dobre liczby
@@ -98,6 +126,22 @@ public class CalculatorBmi extends JFrame implements ActionListener {
         return correct;
     }
 
+    // metoda do sprawdzania BMI
+    private void checkBMI() {
+        if (BMI <= 18) {
+            msg = "Underweight";
+        } else if (BMI > 18 && BMI <= 24) {
+            msg = "Healty";
+        } else if (BMI > 24 && BMI <= 29) {
+            msg = "Overweight";
+        } else if (BMI > 29 && BMI <= 39) {
+            msg = "Obese";
+        } else if (BMI > 39 && BMI <= 65) {
+            msg = "Extremely Obese";
+        }
+    }
+
+    // MAIN
     public static void main(String[] args) {
         new CalculatorBmi();
     }
@@ -113,6 +157,7 @@ public class CalculatorBmi extends JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(null, "Your are to young!");
             else {
                 calc();
+                checkBMI();
                 results();
             }
         }

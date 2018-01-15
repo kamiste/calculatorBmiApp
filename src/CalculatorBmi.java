@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 public class CalculatorBmi extends JFrame implements ActionListener {
@@ -20,13 +21,14 @@ public class CalculatorBmi extends JFrame implements ActionListener {
         setLocationRelativeTo(null); // ustawienie okna na srodku
 
         // tworze etykiety
-        mainLabel = new JLabel("<html><center>Enter your data and calculate BMI !</center>You must have weight>45 and height>150</html>", SwingConstants.CENTER);
+        mainLabel = new JLabel("<html><center>Enter your data and calculate BMI !</center>" +
+                "You must have weight>45 and height>150</html>", SwingConstants.CENTER);
         weightLabel = new JLabel("Your weight [kg]: ");
         weightLabel.setPreferredSize(new Dimension(100, 15));
         heightLabel = new JLabel("Your height [cm]: ");
         heightLabel.setPreferredSize(new Dimension(100, 15));
 
-        // tworze pola tekstowe
+        // tworze pola sformatowane, mozna wprowadzic tylko liczby
         weightTxt = new JFormattedTextField(NumberFormat.getNumberInstance());
         weightTxt.setPreferredSize(new Dimension(25, 15));
         heightTxt = new JFormattedTextField(NumberFormat.getNumberInstance());
@@ -43,7 +45,7 @@ public class CalculatorBmi extends JFrame implements ActionListener {
         inputPanel.add(heightLabel);
         inputPanel.add(heightTxt);
 
-        // tworze przycisk do obliczen
+        // tworze przycisk do obslugi zdarzen
         actionButton = new JButton("Calculate!");
         actionButton.setPreferredSize(new Dimension(150, 20));
         actionButton.addActionListener(this);
@@ -64,22 +66,36 @@ public class CalculatorBmi extends JFrame implements ActionListener {
 
     private void getW() {
         weight = Double.parseDouble(weightTxt.getText());
-        System.out.println("getW");
     }
 
     private void getH() {
         height = (Double.parseDouble(heightTxt.getText()) / 100);
-        System.out.println("getH");
     }
 
     private void calc() {
-        System.out.println("calc");
         BMI = ((weight) / (Math.pow(height, 2)));
     }
 
     private void results() {
-        System.out.println("results");
-        JOptionPane.showMessageDialog(null, "Your's BMI : " + BMI);
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
+        JOptionPane.showMessageDialog(null, "Your's BMI : " + df.format(BMI));
+    }
+
+    private boolean isCorrect() {
+        boolean correct = true;
+        // sprawdzanie czy wprowadzone sa dobre liczby
+        if (weightTxt.getText().isEmpty() && heightTxt.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Give your weight and height, just numbers!");
+            correct = false;
+        } else if (weightTxt.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Give your weight, just numbers!");
+            correct = false;
+        } else if (heightTxt.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Give your height, just numbers!");
+            correct = false;
+        }
+        return correct;
     }
 
     public static void main(String[] args) {
@@ -90,15 +106,7 @@ public class CalculatorBmi extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        //JButton actButton = (JButton)(e.getSource());
-
-        if (weightTxt.getText().isEmpty() && heightTxt.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Give your weight and height, just numbers!");
-        } else if (weightTxt.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Give your weight, just numbers!");
-        } else if (heightTxt.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Give your height, just numbers!");
-        } else {
+        if (isCorrect()) {
             getW();
             getH();
             if (weight <= 45 || height <= 1.5)
